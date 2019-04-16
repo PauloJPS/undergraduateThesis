@@ -1,1 +1,2 @@
-repository used to work on my undergraduateThesis latex writting and coding.
+repository used to write my undergraduate thesis and program my simulations 
+
