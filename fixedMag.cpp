@@ -10,12 +10,14 @@
 const unsigned long int bits = 8;
 
 unsigned long int ieor(int integer, int pos1, int pos2);
+unsigned long int cycleBits(int integer);
 int btest(int integer, int position);
 void Deallocate(float **H, int N);
 float** Allocate(int N);
 long int fat(int N);
 int bitSum(int integer);
 int findState(int *sa,int s, int dim);
+void representative(unsigned int s, unsigned int &r, unsigned int &l){
 
 int main(){
 	int N, dim, nUp, M;
@@ -28,7 +30,7 @@ int main(){
 	std :: ofstream outPut;
 	outPut.open("Hamiltonian.txt");
 
-	N = 3;
+	N = 5;
 	dim = pow(2, N);
 	
 	H = Allocate(dim);
@@ -70,6 +72,35 @@ int main(){
 	delete [] sa;
 
 	outPut.close();
+}
+
+
+void representative(unsigned int s, unsigned int &r, unsigned int &l){
+	int t=s;
+    l=0;
+    r=s;
+    for(int i = 0; i<4-1; i++){
+        t = cycleBits(t);
+        if( t <  r){
+            r = t;
+            l = i;
+        }   
+	}   
+	std :: cout<<r<<'\n';
+	std :: cout<<l<<'\n';
+}
+
+unsigned long int cycleBits(int integer){
+	char aux0, aux1;
+	char binary1[bits];
+	std :: string binary = std::bitset<bits>(integer).to_string();
+	for(int i=0; i<bits; i++){
+		binary1[(i+1) % bits] = binary[i];
+	}
+	unsigned long int decimal = std::bitset<bits>(binary1).to_ulong();
+	std :: cout<<binary1<<'\n';
+	std :: cout<<binary<<'\n';
+	return decimal;
 }
 
 int findState(int *sa,int s, int dim){
