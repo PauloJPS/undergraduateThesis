@@ -9,7 +9,7 @@ def homogeniusSD(nSpin):
 
 def inemogeniosSD(nSpins, nImp):
     nImsList = [(-1)**i for i in range(nImp)]
-    nSpinList = [(-1)**(i+1)/2 for i in range(nImp)]
+    nSpinList = [(-1)**(i+1)/2 for i in range(nSpins)]
     return np.array(nImsList + nSpinList)
 
 
@@ -39,6 +39,23 @@ def exactKittelShore(spinsDistribution):
     s = [i*(i+1) for i in s]
     return (-st + np.sum(s))/2
 
+def plotSpinsImp():
+    n = [i for i in range(30)]
+    exac = [-exactKittelShore(inemogeniosSD(i-30, i)) for i in n]
+    ks = [-lsaFunctional(inemogeniosSD(i-30, i)) for i in n]
+
+    plt.scatter(n, ks, marker='s', color='red', label=r'$E_0^{LSA}$', edgecolor='black', s=100)
+    plt.scatter(n, exac, marker='o',  color='blue', label=r'$E_0^{Exa}$', edgecolor='black')
+    plt.scatter(n, [exac[i]-ks[i] for i in n], marker='*', label=r'$\Delta(E_0^{Exa}-E_0^{LSA})$', color='black')
+
+    plt.ylabel('Energia [J]', fontsize=15)
+    plt.xlabel(r'$\# Impurezas$', fontsize=15)
+    
+    plt.legend(fontsize='x-large')
+    plt.tight_layout() 
+
+
+
 def plotSpinsLSAxExacHomogenio():
     N = list(range(50, 1000, 50))
     spins = [1/2, 1, 3/2, 2]
@@ -62,4 +79,7 @@ def plotSpinsLSAxExacHomogenio():
     plt.tight_layout()
 
     return lsaF, exac
+
+
+
 
