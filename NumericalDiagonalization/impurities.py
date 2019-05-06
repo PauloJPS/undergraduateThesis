@@ -4,44 +4,182 @@ import numpy as np
 import matplotlib.pyplot as plt 
 
 
-def matx():
-    col = [1, 0, 2, 1]
-    row = [0, 1, 1, 2]
-    data = [1, 1, 1, 1]
-    return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
+def matx(n):
+    if n==1:
+        col = [1, 0, 2, 1]
+        row = [0, 1, 1, 2]
+        data = 1/np.sqrt(2)*np.array([1, 1, 1, 1])
+        return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
+    elif n==0.5:
+        col = [1, 0]
+        row = [0, 1]
+        data = 1/2*np.array([1, 1])
+        return sparse.bsr_matrix((data, (row, col)), shape=(2, 2))
+    else:
+        return 0
 
-def maty():
-    col = [1, 0, 2, 1]
-    row = [0, 1, 1, 2]
-    data = [1, -1, 1, -1]
-    return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
+def maty(n):
+    if n==1:
+        col = [1, 0, 2, 1]
+        row = [0, 1, 1, 2]
+        data = 1/np.sqrt(2)/1j*np.array([1, -1, 1, -1])
+        return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
+    elif n==0.5:
+        col = [1, 0]
+        row = [0, 1]
+        data = 1/2*np.array([(0. -1.j), (0. +1.j)])
+        return sparse.bsr_matrix((data, (row, col)), shape=(2, 2))
+    else: return 0
 
-def matz():
-    col = [0, 2]
-    row = [0, 2]
-    data = [1, -1]
-    return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
+def matz(n):
+    if n==1:
+        col = [0, 2]
+        row = [0, 2]
+        data = [1., -1.]
+        return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
+    elif n==0.5:
+        col = [0, 1]
+        row = [0, 1]
+        data = 1/2*np.array([1, -1])
+        return sparse.bsr_matrix((data, (row, col)), shape=(2, 2))
+    else: return 0
 
-def iden():
-    col = [0,1,2]
-    row = [0,1,2]
-    data = [1, 1, 1]
-    return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
 
-def naiveHamiltonian(n=10):
+def iden(n):
+    if n==1:
+        col = [0,1,2]
+        row = [0,1,2]
+        data = [1, 1, 1]
+        return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
+    elif n==0.5:
+        col = [0,1]
+        row = [0,1]
+        data = [1, 1]
+        return sparse.bsr_matrix((data, (row, col)), shape=(2, 2))
+    else: return 0
+    
+def naiveHamiltonian(func, nSpin, nImp):
     conf = []
-    for j in range(n):
+    sites = impuritieState(nSpin, nImp)
+    for j in range(nSpin):
         conf.append([])
-        for i in range(n):
-            if i == j or i == (j+1)%n:
-                conf[j].append(matx())
+        for i in range(nSpin):
+            if i == j or i == (j+1)%nSpin:
+                conf[j].append(func(sites[i]))
             else:
-                conf[j].append(iden())
+                conf[j].append(iden(sites[i]))
     mats = []
     for i in conf:
         res = sparse.bsr_matrix(1)
         for mat in i:
             res = sparse.kron(res, mat)
-        mats.append(res)
-    return mats.astype(float)
+        mats.append(res.astype(np.float16))
+    return np.sum(mats)
+
+def totalHamiltonian(nSpin, nImp):
+    h = (naiveHamiltonian(matx, nSpin, nImp) + 
+        naiveHamiltonian(maty, nSpin, nImp) + 
+        naiveHamiltonian(matz, nSpin, nImp))
+    return h
+
+def sparceDiagonalization(n, s, which='LM'):
+    h = totalHamiltonian(n, s)
+    if n!=2:
+        return lin.eigsh(h, 1, which=which)[0]/n
+    else:
+        return lin.eigsh(h, 1, which=which)[0]/n
+
+def impuritieState(nSpin, nImp):
+    sites = []
+    for i in range(nSpin):
+        sites.append(1/2)
+    aux = 0 
+    for j in range(nImp):
+        sites[aux] = 1
+        if aux+2 >= nSpin:
+            aux = 1
+        else: aux += 2
+    return sites
+
+def CM(nSpin, nImp):
+    sites = impuritieState(nSpin, nImp)
+    H = 0
+    for i in range(nSpin):
+        H += -(sites[i]*sites[(i+1)%nSpin])
+    return H/nSpin
+
+def SWdft(nSpin, nImp):
+    sites = impuritieState(nSpin, nImp)
+    Delta = (2-np.pi)/np.pi
+    H = 0
+    for i in range(nSpin):
+        H += -(sites[i]*sites[(i+1)%nSpin] - Delta*sites[i])
+    return H/nSpin
+
+def makeSpinsPlot(nSpin=12):
+    eExact1 = []
+    eExact05 = []
+    eCM1 = []
+    eSW1 = []
+    eCM05 = []
+    eSW05 = []
+    for i in range(2, nSpin):
+        mat = totalHamiltonian(i, i)
+        eig = lin.eigsh(mat, k=1, which='LM')[0]
+        eExact1.append(eig)
+        eSW1.append(i*SWdft(i, i))
+        eCM1.append(i*CM(i, i))
+
+        mat = totalHamiltonian(i, 0)
+        eig = lin.eigsh(mat, k=1, which='LM')[0]
+        eExact05.append(eig)
+        eSW05.append(i*SWdft(i, 0))
+        eCM05.append(i*CM(i, 0))
+    
+    plt.figure(figsize=(9,4.5))
+    plt.subplot(121)
+    plt.title(r'$S=1/2$', fontsize=15)
+    plt.plot(range(2, nSpin), eExact05, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black', ms=10)
+    plt.plot(range(2, nSpin), eSW05, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='red', color='red', ms=10) 
+    plt.plot(range(2, nSpin), eCM05,  label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10)
+
+    plt.legend(fontsize=15)
+    plt.xlabel('# Spins', fontsize=15)
+    plt.ylabel(r'$E_0$', fontsize=15)
+
+    plt.subplot(122)
+    plt.title(r'$S=1$', fontsize=15)
+    plt.plot(range(2, nSpin), eExact1, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black', ms=10)
+    plt.plot(range(2, nSpin), eSW1, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='red', color='red', ms=10)
+    plt.plot(range(2, nSpin), eCM1, label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10)
+
+    plt.legend(fontsize=15)
+    plt.xlabel('# Spins', fontsize=15)
+    plt.ylabel(r'$E_0$', fontsize=15)
+
+    plt.tight_layout()
+
+def makeImpuritiesPlot(nSpin=4):
+    eExact = []
+    eSW = []
+    eCM = []
+    for i in range(nSpin+1):
+        mat = totalHamiltonian(nSpin, i)
+        print(mat)
+        eig = lin.eigsh(mat, k=1, which='LM')[0]/nSpin
+        print(eig)
+        eExact.append(eig)
+        eSW.append(SWdft(nSpin, i))
+        eCM.append(CM(nSpin, i))
+    plt.plot(eExact, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black')
+    plt.plot(eSW, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='blue', color='blue')
+    plt.plot(eCM, label=r'$E_0^{CM}$', marker='*', markerfacecolor='green', color='green')
+    plt.legend(fontsize=15)
+    plt.xlabel('# impurezas', fontsize=15)
+    plt.ylabel(r'$\frac{E[S_i]}{N}$', fontsize=20)
+    plt.tight_layout()
+
+
+    
+
 
