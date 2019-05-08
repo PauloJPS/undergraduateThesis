@@ -82,10 +82,9 @@ def totalHamiltonian(nSpin, nImp):
         naiveHamiltonian(matz, nSpin, nImp))
     return h
 
-def sparceDiagonalization(n, s, which='LM'):
-    h = totalHamiltonian(n, s)
-    if n!=2:
-        return lin.eigsh(h, 1, which=which)[0]/n
+def sparceDiagonalization(h, n, which='SA'):
+    if n==2:
+        return lin.eigsh(h, 1, which=which)[0]/n/2
     else:
         return lin.eigsh(h, 1, which=which)[0]/n
 
@@ -105,16 +104,18 @@ def CM(nSpin, nImp):
     sites = impuritieState(nSpin, nImp)
     H = 0
     for i in range(nSpin):
-        H += -(sites[i]*sites[(i+1)%nSpin])
-    return H/nSpin
+        H += (-1)**(i)*sites[i]*(-1)**((i+1)%nSpin)*sites[(i+1)%nSpin]
+    if nSpin == 2: return H/nSpin
+    else: return H/nSpin
 
 def SWdft(nSpin, nImp):
     sites = impuritieState(nSpin, nImp)
     Delta = (2-np.pi)/np.pi
     H = 0
     for i in range(nSpin):
-        H += -(sites[i]*sites[(i+1)%nSpin] - Delta*sites[i])
-    return H/nSpin
+        H += (-1)**(i)*sites[i]*(-1)**((i+1)%nSpin)*sites[(i+1)%nSpin] + Delta*sites[i]
+    if nSpin==2: return H/nSpin/2
+    else: return H/nSpin
 
 def makeSpinsPlot(nSpin=12):
     eExact1 = []
@@ -123,39 +124,53 @@ def makeSpinsPlot(nSpin=12):
     eSW1 = []
     eCM05 = []
     eSW05 = []
+    nSpin = nSpin+1
     for i in range(2, nSpin):
         mat = totalHamiltonian(i, i)
-        eig = lin.eigsh(mat, k=1, which='LM')[0]
+        eig = sparceDiagonalization(mat, i)
         eExact1.append(eig)
-        eSW1.append(i*SWdft(i, i))
-        eCM1.append(i*CM(i, i))
+        eSW1.append(SWdft(i, i))
+        eCM1.append(CM(i, i))
 
         mat = totalHamiltonian(i, 0)
-        eig = lin.eigsh(mat, k=1, which='LM')[0]
+        eig = sparceDiagonalization(mat, i)
         eExact05.append(eig)
-        eSW05.append(i*SWdft(i, 0))
-        eCM05.append(i*CM(i, 0))
+        eSW05.append(SWdft(i, 0))
+        eCM05.append(CM(i, 0))
     
-    plt.figure(figsize=(9,4.5))
-    plt.subplot(121)
-    plt.title(r'$S=1/2$', fontsize=15)
+    plt.figure(figsize=(12,4.5))
+    plt.subplot(131)
+    plt.title(r'$(A)S=1/2$', fontsize=15)
     plt.plot(range(2, nSpin), eExact05, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black', ms=10)
     plt.plot(range(2, nSpin), eSW05, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='red', color='red', ms=10) 
     plt.plot(range(2, nSpin), eCM05,  label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10)
 
     plt.legend(fontsize=15)
     plt.xlabel('# Spins', fontsize=15)
-    plt.ylabel(r'$E_0$', fontsize=15)
+    plt.ylabel(r'$\frac{E_0}{-NJ}/$', fontsize=20)
 
-    plt.subplot(122)
-    plt.title(r'$S=1$', fontsize=15)
+    plt.subplot(132)
+    plt.title(r'$(B)S=1$', fontsize=15)
     plt.plot(range(2, nSpin), eExact1, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black', ms=10)
     plt.plot(range(2, nSpin), eSW1, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='red', color='red', ms=10)
     plt.plot(range(2, nSpin), eCM1, label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10)
 
     plt.legend(fontsize=15)
     plt.xlabel('# Spins', fontsize=15)
-    plt.ylabel(r'$E_0$', fontsize=15)
+    plt.ylabel(r'$\frac{E_0}{-NJ}$', fontsize=20)
+
+    plt.subplot(133)
+
+    plt.plot(range(2, nSpin), [ (i-j)/j for i, j in zip(eSW1, eExact1)], 
+            markerfacecolor='red', color='red', ms=10, label=r'$S=1$', marker='v')
+    plt.plot(range(2, nSpin), [ (i-j)/j for i, j in zip(eSW05, eExact05)], 
+            markerfacecolor='blue', color='blue', ms=10, label=r'$S=1/2$', marker='^')
+    plt.title('(C)', fontsize=15)
+
+    plt.xlabel('# Spins', fontsize=15)
+    plt.ylabel(r'$\mu$', fontsize=20)
+    plt.legend(fontsize=15)
+
 
     plt.tight_layout()
 
@@ -165,18 +180,29 @@ def makeImpuritiesPlot(nSpin=4):
     eCM = []
     for i in range(nSpin+1):
         mat = totalHamiltonian(nSpin, i)
-        print(mat)
-        eig = lin.eigsh(mat, k=1, which='LM')[0]/nSpin
-        print(eig)
+        eig = sparceDiagonalization(mat, nSpin)
         eExact.append(eig)
         eSW.append(SWdft(nSpin, i))
         eCM.append(CM(nSpin, i))
-    plt.plot(eExact, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black')
-    plt.plot(eSW, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='blue', color='blue')
-    plt.plot(eCM, label=r'$E_0^{CM}$', marker='*', markerfacecolor='green', color='green')
+
+    plt.figure(figsize=(12,4.5))
+    plt.figure
+    plt.subplot(121)
+    plt.plot(eExact, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black', ms=10)
+    plt.plot(eSW, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='red', color='red', ms=10)
+    plt.plot(eCM, label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10)
     plt.legend(fontsize=15)
     plt.xlabel('# impurezas', fontsize=15)
-    plt.ylabel(r'$\frac{E[S_i]}{N}$', fontsize=20)
+    plt.ylabel(r'$\frac{E[S_i]}{-NJ}$', fontsize=20)
+    plt.title('(A)', fontsize=15)
+
+    plt.subplot(122)
+    plt.plot(range(0, nSpin+1), [ (i-j)/j for i, j in zip(eSW, eExact)], 
+            marker='*', markerfacecolor='black', color='black', ms=10, label='Desvio Rel.')
+    plt.xlabel('# Impurezas', fontsize=15)
+    plt.ylabel(r'$\mu$', fontsize=15)
+    plt.legend(fontsize=15)
+    plt.title('(B)', fontsize=15)
     plt.tight_layout()
 
 
