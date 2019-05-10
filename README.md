@@ -1,2 +1,2 @@
-repository used to write my undergraduate thesis and program my simulations 
+Codes from my undergraduate thesis 
 
