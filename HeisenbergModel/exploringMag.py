@@ -18,16 +18,15 @@ class Magneto(data2matrix):
                 j = (i+1) % self.__n
                 c = stateList.index(state)
                 if binary[i] == binary[j]:
-                    
-                    if (state, state) in Hdic: 
-                        Hdic[(state, state)] += 1/4
+                    if (c, c) in Hdic: 
+                        Hdic[(c, c)] += 1/4
                     else: 
-                        Hdic.update({(state , state): 1/4})
+                        Hdic.update({(c, c): 1/4})
                 else:
-                    if (state, state) in Hdic: 
-                        Hdic[(state, state)] -= 1/4
+                    if (c, c) in Hdic: 
+                        Hdic[(c, c)] -= 1/4
                     else: 
-                        Hdic.update({(state, state): -1/4})
+                        Hdic.update({(c, c): -1/4})
 
                     s = self.flipBit(np.copy(binary), i, j)
                     s1 = self.getInt(s)
@@ -42,7 +41,7 @@ class Magneto(data2matrix):
     def getStateList(self):
         stateList = [0 for i in range(self.__dim)]
         aux = 0
-        for nUp in range(self.__n):
+        for nUp in range(self.__n + 1):
             for i in range(self.__dim):
                 binary = self.getBinary(i)
                 if np.sum(binary) == nUp : 
