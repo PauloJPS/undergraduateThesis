@@ -3,13 +3,13 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import eigsh
 
 class data2matrix():
-    def __init__(self, n ):
+    def __init__(self, n):
         self.__n = n
         self.__dim = int(2**n)
 
-    def dictinary2sparce(self):
+    def dictinary2sparce(self, which='large'):
         data = []
-        Hdic = self.generateH()
+        Hdic, dim = self.generateH(which)
         for i in Hdic.items():
             aux = i[0]
             data.append([aux[0], aux[1], i[1]])
@@ -18,11 +18,11 @@ class data2matrix():
         col = np.int32(data[:,0])
         data = np.float32(data[:,2])
         
-        mat = sp.coo_matrix((data, (row, col)), shape=(self.__dim, self.__dim))
+        mat = sp.coo_matrix((data, (row, col)), shape=(dim, dim))
         return mat
 
-    def getEigenState(self):
-        mat = self.dictinary2sparce()
+    def getEigenState(self, which='large'):
+        mat = self.dictinary2sparce(which)
         return eigsh(mat, k=1, which='SA', return_eigenvectors=False)[0]
 
     def flipBit(self, binary, i, j):

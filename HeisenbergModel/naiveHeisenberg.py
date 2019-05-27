@@ -9,7 +9,7 @@ class Naive(data2matrix):
         self.__dim = int(2**n)
         super(Naive, self).__init__(n)
 
-    def generateH(self):
+    def generateH(self, which):
         Hdic = {}
         for a in range(int(2**self.__n)):
             for i in range(self.__n):
@@ -32,13 +32,11 @@ class Naive(data2matrix):
                         Hdic[(a,b)] = 1/2
                     else: 
                         Hdic.update({(a,b): 1/2})
-
- 
-        return Hdic
+        return Hdic, self.__dim
 
     @staticmethod
-    def EigenState(n):
-        return Naive(n).getEigenState()/n
+    def EigenState(n, which='large'):
+        return Naive(n).getEigenState(which)/n
   
 
 
