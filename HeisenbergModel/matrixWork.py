@@ -2,45 +2,20 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import eigsh
 
-class Naive():
+class data2matrix():
     def __init__(self, n ):
         self.__n = n
         self.__dim = int(2**n)
 
-    def generateH(self):
-        Hdic = {}
-        for a in range(int(2**self.__n)):
-            for i in range(self.__n):
-                binary = self.getBinary(a)
-                j = (i+1) % self.__n
-                if binary[i] == binary[j]:
-                    if (a,a) in Hdic:
-                        Hdic[(a,a)] += 1/4
-                    else: 
-                        Hdic.update({(a,a): 1/4})
-                else:
-                    if (a,a) in Hdic:
-                        Hdic[(a,a)] -= 1/4
-                    else: 
-                        Hdic.update({(a,a): -1/4})
-
-                    b = self.flipBit(binary, i, j)
-                    b = self.getInt(b)
-                    if (a,b) in Hdic:
-                        Hdic[(a,b)] -= 1/4
-                    else: 
-                        Hdic.update({(a,b): -1/2})
-        return Hdic
-
     def dictinary2sparce(self):
-        Hdic = self.generateH()
         data = []
+        Hdic = self.generateH()
         for i in Hdic.items():
             aux = i[0]
             data.append([aux[0], aux[1], i[1]])
         data = np.array(data)
-        row = np.int32(data[:,0])
-        col = np.int32(data[:,1])
+        row = np.int32(data[:,1])
+        col = np.int32(data[:,0])
         data = np.float32(data[:,2])
         
         mat = sp.coo_matrix((data, (row, col)), shape=(self.__dim, self.__dim))
@@ -50,12 +25,9 @@ class Naive():
         mat = self.dictinary2sparce()
         return eigsh(mat, k=1, which='SA', return_eigenvectors=False)[0]
 
-    @staticmethod
-    def EigenState(n):
-        h = Naive(n) 
-        return h.getEigenState()/n
-
     def flipBit(self, binary, i, j):
+        #binary[self.__n - 1 -i] = (binary[self.__n - 1 -i] + 1) % 2
+        #binary[self.__n - 1 -j] = (binary[self.__n - 1 -j] + 1) % 2
         binary[i] = (binary[i] + 1) % 2
         binary[j] = (binary[j] + 1) % 2
         return binary
