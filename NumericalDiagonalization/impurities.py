@@ -8,6 +8,12 @@ sys.path.insert(0, '/home/bilu/Documents/undergraduateThesis/KittelShoreModel')
 
 from matrixes import *
 
+sys.path.append('../HeisenbergModel/')
+
+from naiveHeisenberg import *
+from exploringMag import *
+
+
        
 class oneDimHeisenberg(operators):
     def __init__(self, nSpin, nImp):
@@ -75,12 +81,17 @@ class oneDimHeisenberg(operators):
         else: return H/self.nSpin
 
     def ExaDFT(self):
+        e0data = np.loadtxt('../HeisenbergModel/Heisenberg12.txt')
         sites = self.impuritieState()
-
-        e05 = oneDimHeisenberg(self.nSpin, 0)
-        e05 = e05.sparceDiagonalization()
-        e01 = oneDimHeisenberg(self.nSpin, self.nSpin)
-        e01 = e01.sparceDiagonalization()
+        if 1 in sites: 
+            e05 = oneDimHeisenberg(self.nSpin, 0)
+            e05 = e05.sparceDiagonalization()
+            e01 = oneDimHeisenberg(self.nSpin, self.nSpin)
+            e01 = e01.sparceDiagonalization()
+            print('ooooi')
+        else:
+            e05 = e0data[self.nSpin - 4][1]
+            e01 = 1
 
         dic = {1:e01, 0.5:e05}
         H = 0

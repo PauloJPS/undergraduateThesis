@@ -5,6 +5,7 @@
 #include <string>
 #include <bitset>
 #include <cstdio>
+#include <cmath>
 
 
 const unsigned long int bits = 8;
@@ -17,12 +18,12 @@ float** Allocate(int N);
 long int fat(int N);
 int bitSum(int integer);
 int findState(int *sa,int s, int dim);
-void representative(unsigned int s, unsigned int &r, unsigned int &l){
+void representative(unsigned int s, unsigned int &r, unsigned int &l);
 
 int main(){
 	int N, dim, nUp, M;
 	int i, j, aux;
-	int state, s;
+	int state, s, pos;
 	int *sa;
 
 	float **H;
@@ -30,7 +31,7 @@ int main(){
 	std :: ofstream outPut;
 	outPut.open("Hamiltonian.txt");
 
-	N = 5;
+	N = 3;
 	dim = pow(2, N);
 	
 	H = Allocate(dim);
@@ -44,28 +45,32 @@ int main(){
 			}
 		}
 	}
+	for(i=0; i<dim; i++){
+		std :: cout<<sa[i]<<"\n";
+	}
 	
 	for(state=0; state<dim; state++){
 		for(i=0; i<N; i++){
 			j = (i+1)%N;
+			pos = findState(sa, state, dim);
 			if(btest(sa[state], i) == btest(sa[state], j)){
-				H[state][state] = H[state][state] + 1./4.;
+				H[pos][pos] = H[pos][pos] + 1./4.;
 			}else{
-				H[state][state] = H[state][state] - 1./4.;
+				H[pos][pos] = H[pos][pos] - 1./4.;
 				s = ieor(sa[state], i, j);
 				aux = findState(sa, s, dim);
-				H[state][aux] = H[state][aux] + 1./2.;
+				H[pos][aux] = H[pos][aux] + 1./2.;
 			}
 		}
 	}
 	
-	std :: cout<<findState(sa, 3, dim)<<"\n";
 
 	for(i=0; i<dim; i++){
 		for(j=0; j<dim; j++){
-            outPut << H[i][j] << "    ";
+			if( std :: abs(H[i][j]) > 0.00000001){
+            outPut << i << "    " << j << "    " << H[i][j] << "\n ";
+			}
 		}
-		outPut << "\n";
     }
 
 	Deallocate(H, dim);
@@ -86,8 +91,6 @@ void representative(unsigned int s, unsigned int &r, unsigned int &l){
             l = i;
         }   
 	}   
-	std :: cout<<r<<'\n';
-	std :: cout<<l<<'\n';
 }
 
 unsigned long int cycleBits(int integer){
@@ -98,8 +101,6 @@ unsigned long int cycleBits(int integer){
 		binary1[(i+1) % bits] = binary[i];
 	}
 	unsigned long int decimal = std::bitset<bits>(binary1).to_ulong();
-	std :: cout<<binary1<<'\n';
-	std :: cout<<binary<<'\n';
 	return decimal;
 }
 
@@ -176,7 +177,6 @@ unsigned long int ieor(int integer, int pos0, int pos1){
 		binary[bits - pos1 - 1] = '1';
 	}
 	unsigned long decimal = std::bitset<bits>(binary).to_ulong();
-	std :: cout<<binary<<'\n';
 	return decimal;
 }
 

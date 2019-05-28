@@ -2,75 +2,27 @@ from scipy.sparse import linalg as lin
 import scipy.sparse as sparse
 import numpy as np
 import matplotlib.pyplot as plt 
-
-def matx(n):
-    if n==1:
-        col = [1, 0, 2, 1]
-        row = [0, 1, 1, 2]
-        data = 1/np.sqrt(2)*np.array([1, 1, 1, 1])
-        return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
-    elif n==0.5:
-        col = [1, 0]
-        row = [0, 1]
-        data = 1/2*np.array([1, 1])
-        return sparse.bsr_matrix((data, (row, col)), shape=(2, 2))
-    else:
-        return 0
-
-def maty(n):
-    if n==1:
-        col = [1, 0, 2, 1]
-        row = [0, 1, 1, 2]
-        data = 1/np.sqrt(2)/1j*np.array([1, -1, 1, -1])
-        return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
-    elif n==0.5:
-        col = [1, 0]
-        row = [0, 1]
-        data = 1/2*np.array([(0. -1.j), (0. +1.j)])
-        return sparse.bsr_matrix((data, (row, col)), shape=(2, 2))
-    else: return 0
-
-def matz(n):
-    if n==1:
-        col = [0, 2]
-        row = [0, 2]
-        data = [1., -1.]
-        return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
-    elif n==0.5:
-        col = [0, 1]
-        row = [0, 1]
-        data = 1/2*np.array([1, -1])
-        return sparse.bsr_matrix((data, (row, col)), shape=(2, 2))
-    else: return 0
+from matrixes import *
 
 
-def iden(n):
-    if n==1:
-        col = [0,1,2]
-        row = [0,1,2]
-        data = [1, 1, 1]
-        return sparse.bsr_matrix((data, (row, col)), shape=(3, 3))
-    elif n==0.5:
-        col = [0,1]
-        row = [0,1]
-        data = [1, 1]
-        return sparse.bsr_matrix((data, (row, col)), shape=(2, 2))
-    else: return 0
-
-def naiveHamiltonian(func, nSpin, nImp):
+def naiveHamiltonian(ax, nSpin, nImp):
+    print(operators)
     conf = []
     sites = impuritieState(nSpin, nImp)
     n=0
-    for i in range(nSpin-1):
+    for i in range(nSpin):
         for k in range(i+1, nSpin):
             conf.append([])
             for j in range(nSpin):
                 if j==k or j==i:
-                    conf[n].append(func(sites[i]))
+                    conf[n].append(operators.mat(sites[j], ax))
+                    #conf[n].append(('func(sites[i])', '%i'%sites[j]))
                 else:
-                    conf[n].append(iden(sites[i]))
+                    conf[n].append(operators.mat(sites[j], 'i'))
+                    #conf[n].append(('iden(sites[i])', '%i'%sites[j]))
 
             n += 1
+    conf = np.array(conf)
     mats = []
     for i in conf:
         res = sparse.bsr_matrix(1)
@@ -78,7 +30,6 @@ def naiveHamiltonian(func, nSpin, nImp):
             res = sparse.kron(res, mat)
         mats.append(res.astype(np.float16))
     return np.sum(mats)
-
 
 def impuritieState(nSpin, nImp):
     sites = []
@@ -93,9 +44,9 @@ def impuritieState(nSpin, nImp):
     return sites
 
 def totalHamiltonian(nSpin, nImp):
-    h = (naiveHamiltonian(matx, nSpin, nImp) +
-        naiveHamiltonian(maty, nSpin, nImp) +
-        naiveHamiltonian(matz, nSpin, nImp))
+    h = (naiveHamiltonian('x', nSpin, nImp) +
+        naiveHamiltonian('y', nSpin, nImp) +
+        naiveHamiltonian('z', nSpin, nImp))
     return h
 
 
