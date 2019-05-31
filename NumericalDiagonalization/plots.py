@@ -40,27 +40,27 @@ def makeSpinsPlot(nSpin=12, nSpin12=14):
 
     plt.subplot(131)
     plt.title(r'$(A)S=1/2$', fontsize=15)
+    plt.plot(n12 , eCM05,  label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10, markeredgecolor='black')
     plt.plot(n12 , eExact05, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black', ms=10, markeredgecolor='black')
     plt.plot(n12 , eSW05, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='red', color='red', ms=10, markeredgecolor='black') 
-    plt.plot(n12 , eCM05,  label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10, markeredgecolor='black')
-    plt.plot(n12 , eEX05,  label=r'$E_0^{LSA-EX}$', marker='*', markerfacecolor='green', color='green', ms=10, markeredgecolor='black')
+    #plt.plot(n12 , eEX05,  label=r'$E_0^{LSA-EX}$', marker='*', markerfacecolor='green', color='green', ms=10, markeredgecolor='black')
 
-    plt.legend(fontsize=12)
-    plt.ylim(-.7, -.1)
-    plt.xlabel('# Spins', fontsize=15)
-    plt.ylabel(r'$\frac{E_0}{-NJ}$', fontsize=20)
+    plt.legend(fontsize=20)
+    plt.ylim(-.7, -.2)
+    plt.xlabel('N', fontsize=20)
+    plt.ylabel(r'$\frac{E_0}{JN}$', fontsize=30, rotation=0, labelpad=20)
 
     plt.subplot(132)
     plt.title(r'$(B)S=1$', fontsize=15)
+    plt.plot( n, eCM1, label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10, markeredgecolor='black')
     plt.plot( n, eExact1, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black', ms=10, markeredgecolor='black')
     plt.plot( n, eSW1, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='red', color='red', ms=10, markeredgecolor='black')
-    plt.plot( n, eCM1, label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10, markeredgecolor='black')
-    plt.plot( n, eEX1,  label=r'$E_0^{LSA-EX}$', marker='*', markerfacecolor='green', color='green', ms=10, markeredgecolor='black')
+    #plt.plot( n, eEX1,  label=r'$E_0^{LSA-EX}$', marker='*', markerfacecolor='green', color='green', ms=10, markeredgecolor='black')
 
-    plt.legend(fontsize=12)
+    plt.legend(fontsize=20)
     plt.ylim(-1.8, -.5)
-    plt.xlabel('# Spins', fontsize=15)
-    plt.ylabel(r'$\frac{E_0}{-NJ}$', fontsize=20)
+    plt.xlabel('N', fontsize=20)
+    plt.ylabel(r'$\frac{E_0}{JN}$', fontsize=30, rotation=0, labelpad=20)
 
     plt.subplot(133)
 
@@ -69,16 +69,16 @@ def makeSpinsPlot(nSpin=12, nSpin12=14):
     plt.plot(n12 , [ (i-j)/j for i, j in zip(eSW05, eExact05)], 
             markerfacecolor='red', color='red', ms=10, label=r'$LSA-SW(S=1/2)$', marker='o', markeredgecolor='black')
 
-    plt.plot(n , [ (i-j)/j for i, j in zip(eEX1, eExact1)], 
-            markerfacecolor='green', color='green', ms=10, label=r'$LSA-EX(S=1)$', marker='s', markeredgecolor='black')
-    plt.plot(n12 , [ (i-j)/j for i, j in zip(eEX05, eExact05)], 
-            markerfacecolor='green', color='green', ms=7, label=r'$LSA-EX(S=1/2)$', marker='o', markeredgecolor='black')
+    #plt.plot(n , [ (i-j)/j for i, j in zip(eEX1, eExact1)], 
+            #markerfacecolor='green', color='green', ms=10, label=r'$LSA-EX(S=1)$', marker='s', markeredgecolor='black')
+    #plt.plot(n12 , [ (i-j)/j for i, j in zip(eEX05, eExact05)], 
+            #markerfacecolor='green', color='green', ms=7, label=r'$LSA-EX(S=1/2)$', marker='o', markeredgecolor='black')
 
-    plt.title('(C)', fontsize=15)
+    plt.title('(C)', fontsize=20)
 
-    plt.xlabel('# Spins', fontsize=15)
-    plt.ylabel(r'$\mu$', fontsize=20)
-    plt.legend(fontsize=12)
+    plt.xlabel('N', fontsize=15)
+    plt.ylabel(r'$\mu$', fontsize=30, rotation=0, labelpad=20)
+    plt.legend(fontsize=15)
 
     plt.tight_layout()
     
@@ -98,13 +98,14 @@ def makeImpuritiesPlot(nSpin=4):
     plt.figure(figsize=(12,6.5))
     plt.figure
     plt.subplot(121)
-    plt.plot(eExact, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black', ms=10, markeredgecolor='black')
-    plt.plot(eSW, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='red', color='red', ms=10, markeredgecolor='black')
-    plt.plot(eCM, label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=10, markeredgecolor='black')
-    plt.plot(eEX, label=r'$E_0^{LSA-EX}$', marker='^', markerfacecolor='green', color='green', ms=10, markeredgecolor='black')
-    plt.legend(fontsize=15)
-    plt.xlabel('# impurezas', fontsize=15)
-    plt.ylabel(r'$\frac{E[S_i]}{-NJ}$', fontsize=20)
+    plt.plot(eCM, label=r'$E_0^{CM}$', marker='*', markerfacecolor='blue', color='blue', ms=12, markeredgecolor='black')
+    plt.plot(eExact, label=r'$E_0^{exat}$', marker='o', markerfacecolor='black', color='black', ms=12, markeredgecolor='black')
+    plt.plot(eSW, label=r'$E_0^{LSA-SW}$', marker='s', markerfacecolor='red', color='red', ms=12, markeredgecolor='black')
+    plt.plot(eEX, label=r'$E_0^{LSA-EX}$', marker='^', markerfacecolor='green', color='green', ms=12, markeredgecolor='black')
+
+    plt.legend(fontsize=20)
+    plt.xlabel(r'$N_i$', fontsize=20)
+    plt.ylabel(r'$\frac{E_0[S_i]}{JN}$', fontsize=30, rotation=0, labelpad=20)
     plt.title('(A)', fontsize=15)
 
     plt.subplot(122)
@@ -112,9 +113,10 @@ def makeImpuritiesPlot(nSpin=4):
             marker='s', markerfacecolor='red', color='red', ms=10, label='LSA-SW', markeredgecolor='black')
     plt.plot(range(0, nSpin+1), [ (i-j)/j for i, j in zip(eEX, eExact)], 
             marker='^', markerfacecolor='green', color='green', ms=10, label='LSA-EX', markeredgecolor='black')
-    plt.xlabel('# Impurezas', fontsize=15)
-    plt.ylabel(r'$\mu$', fontsize=15)
-    plt.legend(fontsize=15)
+    
+    plt.xlabel(r'$N_i$', fontsize=20)
+    plt.ylabel(r'$\mu$', fontsize=30, rotation=0, labelpad=20)
+    plt.legend(fontsize=20)
     plt.title('(B)', fontsize=15)
     plt.tight_layout()
 

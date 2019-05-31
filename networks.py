@@ -24,9 +24,9 @@ def plotNetwor():
     nx.draw_networkx_edges(gnx1, pos1, ax=ax[0])
     nx.draw_networkx_edges(gnxKS, posKS, ax=ax[1])
 
-    ax[0].set_title('(A) Heisenberg 1-D', fontsize=15)
+    ax[0].set_title('(A)', fontsize=15)
     ax[0].set_axis_off()
-    ax[1].set_title('(B) Heisenberg TTI', fontsize=15)
+    ax[1].set_title('(B)', fontsize=15)
     ax[1].set_axis_off()
 
     plt.tight_layout()

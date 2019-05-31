@@ -30,23 +30,23 @@ def plotSpinHomo():
 
     plt.subplot(121)
     plt.title('(A)' + r'$S=1/2$', fontsize=15)
-    plt.plot(n, ks05, marker='s',  label=r'$E_0^{LSA}$', markeredgecolor='black', color='red', ms=10)
-    plt.plot(n, exac05, marker='o',   label=r'$E_0^{Exa}$', markeredgecolor='black', color='black', ms=7)
-    plt.plot(n, cm05, marker='*',   label=r'$E_0^{CM}$', markeredgecolor='black', color='blue', ms=10)
+    plt.plot(n, cm05, marker='*',   label=r'$E_0^{CM}$', markeredgecolor='black', color='blue', ms=13)
+    plt.plot(n, ks05, marker='o',  label=r'$E_0^{LSA}$', markeredgecolor='black', color='red', ms=13)
+    plt.plot(n, exac05, marker='o',   label=r'$E_0^{Exa}$', markeredgecolor='black', color='black', ms=5)
  
-    plt.ylabel(r'$\frac{E_0}{-J}$', fontsize=20)
-    plt.xlabel('# Spins', fontsize=15)
-    plt.legend(fontsize=15)
+    plt.ylabel(r'$\frac{E_0}{J}$', fontsize=30, rotation=0, labelpad=20)
+    plt.xlabel('N', fontsize=25)
+    plt.legend(fontsize=20)
 
     plt.subplot(122)
     plt.title('(B)' + r'$S=1$', fontsize=15)
-    plt.plot(n, ks1, marker='s',  label=r'$E_0^{LSA}$', markeredgecolor='black', color='red', ms=10)
-    plt.plot(n, exac1, marker='o',   label=r'$E_0^{Exa}$', markeredgecolor='black', color='black', ms=7)
-    plt.plot(n, cm1, marker='*',   label=r'$E_0^{CM}$', markeredgecolor='black', color='blue', ms=10)
+    plt.plot(n, cm1, marker='*',   label=r'$E_0^{CM}$', markeredgecolor='black', color='blue', ms=13)
+    plt.plot(n, ks1, marker='o',  label=r'$E_0^{LSA}$', markeredgecolor='black', color='red', ms=13)
+    plt.plot(n, exac1, marker='o',   label=r'$E_0^{Exa}$', markeredgecolor='black', color='black', ms=5)
  
-    plt.ylabel(r'$\frac{E_0}{-J}$', fontsize=20)
-    plt.xlabel('# Spins', fontsize=15)
-    plt.legend(fontsize=15)
+    plt.ylabel(r'$\frac{E_0}{J}$', fontsize=30, rotation=0, labelpad=20)
+    plt.xlabel('N', fontsize=25)
+    plt.legend(fontsize=20)
 
     plt.tight_layout() 
 
@@ -65,16 +65,15 @@ def plotSpinsImp():
 
     plt.figure(figsize=(12, 6.5))
 
-    plt.title('(A)', fontsize=15)
-    plt.plot(n, ks, marker='s',  label=r'$E_0^{LSA}$', 
-            markeredgecolor='black', color='red', ms=12)
-    plt.plot(n, exac, marker='o',   label=r'$E_0^{Exa}$',
-        markeredgecolor='black', color='black', ms=8)
     plt.plot(n, cm, marker='*',   label=r'$E_0^{CM}$', 
-        markeredgecolor='black', color='blue', ms=12)
- 
-    plt.ylabel(r'$\frac{E_0}{-J}$', fontsize=20)
-    plt.xlabel('# Impurezas', fontsize=15)
+        markeredgecolor='black', color='blue', ms=13)
+    plt.plot(n, ks, marker='o',  label=r'$E_0^{LSA}$', 
+            markeredgecolor='black', color='red', ms=13)
+    plt.plot(n, exac, marker='o',   label=r'$E_0^{Exa}$',
+        markeredgecolor='black', color='black', ms=5)
+    
+    plt.ylabel(r'$\frac{E_0}{J}$', fontsize=30, rotation=0, labelpad=20)
+    plt.xlabel(r'$N_i$', fontsize=25)
     plt.legend(fontsize=15)
 
     plt.tight_layout() 
